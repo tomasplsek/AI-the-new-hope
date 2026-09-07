@@ -1,0 +1,12 @@
+1. Intro + OpenAI in Python + GitHub copilot / Codex first look
+2. Models and pricing, Codex intro + installation & setup
+3. Codex deeply - mcp servers, tool calls, skills.md, rules.md
+4. Tour de Tools (Codex, Claude, Github Copilot, Warp)
+6. Ollama + OpenWeight models + Local models + MUNI AI
+7. Student projects - till end of semester
+
+
+?. Openclaw + Whatsapp - Own blog?
+
+
+- first 5 minutes for news?

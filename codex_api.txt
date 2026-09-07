@@ -1,0 +1,3 @@
+  export OPENAI_API_KEY="your_key"
+  printenv OPENAI_API_KEY | codex login --with-api-key
+  unset OPENAI_API_KEY
