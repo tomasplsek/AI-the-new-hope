@@ -1,12 +1,27 @@
-1. Intro + OpenAI in Python + GitHub copilot / Codex first look
-2. Models and pricing, Codex intro + installation & setup
-3. Codex deeply - mcp servers, tool calls, skills.md, rules.md
-4. Tour de Tools (Codex, Claude, Github Copilot, Warp)
-6. Ollama + OpenWeight models + Local models + MUNI AI
-7. Student projects - till end of semester
+1. Introduction + OpenAI in Python + GitHub copilot first look
+	- we can start with News (Navier-Stokes?)
+	- students will introduce themselves
+	- Jupyter notebook: multimodality, Dense vs MoE, tools, context, agents, harness
+	- OpenAI playground (for gpt-4o, one can set temperature)
+	- GitHub copilot first look
+
+2. Models and pricing (OpenAI), Codex intro + installation & setup
+	- codex installation and setup
+	- model comparison and pricing (reasoning effort)
+	- planning phase (ideally most advanced model) - you will never one-shot a problem
+	- prompt writing tips (English - do not waste tokens, but locality - Czech things in Czech)
+	- CLI vs GUI versions (long-term memory)
+
+3. Tour de Tools / Harnesses (Codex, Claude Code, Github Copilot, Warp - MCP, REPL)
+
+4. Ollama + OpenWebUI + OpenWeight models + Local models + MUNI AI (GLM-5.3 and Kimi-K3), Hermes, Opencode
+
+5. Equation-dominated AI use (axioms + algebra -> Lean) 
+
+6. Student projects - till end of semester
 
 
-?. Openclaw + Whatsapp - Own blog?
+?. Openclaw + Whatsap - Own blog for news?
 
 
 - first 5 minutes for news?

@@ -10,19 +10,14 @@
   },
   {
    "cell_type": "markdown",
-   "id": "a1c0de01",
+   "id": "053f6fcb",
    "metadata": {},
    "source": [
-    "## **What is a large language model?**\n",
+    "## **Before we install anything: the vocabulary**\n",
     "\n",
-    "- One very large mathematical **function**: text in, text out. There is nothing else in the box.\n",
-    "- It was fitted once, on a large fraction of everything ever written. Hence the **knowledge\n",
-    "  cutoff** — it has never seen anything that appeared after that date.\n",
-    "- The result is a pile of numbers, the **weights**, and they are **frozen**. Nothing you say\n",
-    "  changes them.\n",
-    "- No database, no internet, no memory of yesterday — unless *you* put it into the input.\n",
-    "- **GPT** = **G**enerative **P**re-trained **T**ransformer: it generates, it was pre-trained once,\n",
-    "  and the architecture is a transformer."
+    "Ten terms, one picture each. You will hear all of them from next week on.\n",
+    "\n",
+    "> **The model is a fixed function. The only thing you control is its input.**"
    ]
   },
   {
@@ -30,48 +25,60 @@
    "id": "235b6e60",
    "metadata": {},
    "source": [
-    "## **Tokens and the next token**\n",
+    "# **1. Tokens**\n",
     "\n",
     "<img src=\"fig_tokens.png\" width=\"950\" style=\"display:block;margin:1.2em auto;\">\n",
     "\n",
-    "- The model never sees letters or words. Text is cut into **tokens** — chunks of characters from a\n",
-    "  fixed vocabulary (~10⁵ entries) — and each token is just an integer.\n",
-    "- A common word is one token; rare names, other languages, numbers and code split into several.\n",
-    "- Rule of thumb: ~4 characters ≈ 1 token, 1000 tokens ≈ 750 words.\n",
-    "- Everything — the price, the limits, the speed — is counted in tokens."
+    "- **Token** — a chunk of characters, the unit the model reads and writes.\n",
+    "- Common words = 1 token; rare words, numbers and code split into many.\n",
+    "- Everything is billed and limited in tokens, so token count = money."
    ]
+  },
+  {
+   "cell_type": "code",
+   "id": "3f3fae03",
+   "metadata": {},
+   "source": [
+    "# pip install tiktoken\n",
+    "import tiktoken\n",
+    "\n",
+    "enc = tiktoken.get_encoding(\"o200k_base\")      # vocabulary of recent OpenAI models\n",
+    "\n",
+    "text = \"The cluster's L_X = 3.2e44 erg/s\"\n",
+    "ids = enc.encode(text)\n",
+    "\n",
+    "print(len(ids), \"tokens\")\n",
+    "print([enc.decode([i]) for i in ids])\n",
+    "print(ids)"
+   ],
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "id": "d107f0e7",
+   "metadata": {},
+   "source": [
+    "# same meaning, very different price\n",
+    "for s in [\"galaxy cluster\", \"kupa galaxii\", \"3.14159\", \"np.sqrt(2)\"]:\n",
+    "    print(f\"{len(enc.encode(s)):>3} tokens   {s}\")"
+   ],
+   "execution_count": null,
+   "outputs": []
   },
   {
    "cell_type": "markdown",
    "id": "d6fffac6",
    "metadata": {},
    "source": [
-    "## **What it does with them: guess the next token**\n",
+    "# **2. What the model does: guess the next token**\n",
     "\n",
     "<img src=\"fig_next_token.png\" width=\"950\" style=\"display:block;margin:1.2em auto;\">\n",
     "\n",
-    "- Given the tokens so far, the model returns a **probability for every token in the vocabulary**.\n",
-    "  That is the entire operation: no plan, no goal, no draft of the answer.\n",
-    "- **Sampling** then picks one of them; **temperature** says how adventurous that pick is\n",
-    "  (0 = always the most likely token). Not anymore for reasoning models - temperature param was dropped.\n",
-    "- **Hallucination** is therefore not a malfunction. A fluent, plausible continuation is exactly\n",
-    "  what the model is for."
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "b7e1a002",
-   "metadata": {},
-   "source": [
-    "## **...and then it does it again**\n",
-    "\n",
-    "- The chosen token is appended to the input and the whole model runs again — **autoregression**.\n",
-    "  A 500-token answer means 500 passes through the whole model.\n",
-    "- Your **input** is processed in one parallel pass, but the **output** has to be produced one token\n",
-    "  at a time. That is why output tokens are typically **3–10× more expensive** than input tokens,\n",
-    "  and why long answers are slow.\n",
-    "- **Reasoning models** first generate a long chain of \"thinking\" tokens before the visible answer.\n",
-    "  You pay for those too, even though you usually never see them."
+    "- The weights (~10¹¹ numbers) are **frozen** — nothing you say changes them.\n",
+    "- **Temperature** — how adventurous the pick is; 0 = always the most likely token.\n",
+    "- Each new token is appended and the whole thing runs again (**autoregression**).\n",
+    "- **Hallucination** is not a bug: a plausible continuation is exactly what it was trained for."
    ]
   },
   {
@@ -79,38 +86,32 @@
    "id": "08e66100",
    "metadata": {},
    "source": [
-    "## **Attention**\n",
+    "# **3. Attention / the transformer**\n",
     "\n",
     "<img src=\"fig_attention.png\" width=\"880\" style=\"display:block;margin:1.2em auto;\">\n",
     "\n",
-    "- **Self-attention** - while processing one token, the model looks back at whichever earlier tokens\n",
-    "  matter and lets them influence it.\n",
-    "- That is how *\"it\"* gets connected to *\"cluster\"* — and how a variable defined 300 lines earlier\n",
-    "  still means something.\n",
-    "- Every token looks at every other one, so the cost grows **quadratically** with context length.\n",
-    "- 2017, [*Attention Is All You Need*](https://arxiv.org/abs/1706.03762) — replaced word-by-word\n",
-    "  reading (RNNs) and started everything that followed.\n",
+    "- **Self-attention** — each token looks back at whichever earlier tokens matter.\n",
+    "- 2017, [*Attention Is All You Need*](https://arxiv.org/abs/1706.03762) — replaced word-by-word RNNs;\n",
+    "  **GPT** = Generative **Pre-trained Transformer**.\n",
     "\n",
     "<img src=\"https://arxiv.org/html/1706.03762v7/Figures/ModalNet-21.png\" width=\"300\" style=\"display:block;margin:1em auto;\">"
    ]
   },
   {
    "cell_type": "markdown",
-   "id": "c4a11e03",
+   "id": "46c46f05",
    "metadata": {},
    "source": [
-    "## **What the model is made of**\n",
+    "# **4. How a model is made**\n",
     "\n",
-    "<img src=\"fig_architecture.png\" width=\"950\" style=\"display:block;margin:1.2em auto;\">\n",
+    "<img src=\"fig_training_stages.png\" width=\"950\" style=\"display:block;margin:1.2em auto;\">\n",
     "\n",
-    "- Tokens → **embedding** (each token becomes a vector) → **N identical transformer blocks**\n",
-    "  (attention + a feed-forward layer) → probabilities for the next token. That is the whole\n",
-    "  architecture.\n",
-    "- A model's size is quoted as its number of **parameters** — the count of numbers inside those\n",
-    "  blocks: ~10⁹ for something that runs on a laptop, ~10¹¹–10¹² for a frontier model.\n",
-    "- Parameters cost memory: roughly **1 GB per 10⁹ parameters** (8-bit), which is why you cannot run\n",
-    "  the big ones at home (lecture 6).\n",
-    "- Bigger ≈ knows more and reasons better, but is slower and more expensive per token."
+    "- **Pre-training** — next-token prediction on ~everything written; this is where the **knowledge\n",
+    "  cutoff** comes from.\n",
+    "- **Fine-tuning + RL** — turns a text-completer into an assistant; long RL gives **reasoning models**\n",
+    "  (the `effort` knob below).\n",
+    "- **You** — weights frozen, you only change the input. Fine-tuning your own model is almost never\n",
+    "  worth it."
    ]
   },
   {
@@ -118,16 +119,14 @@
    "id": "128d1374",
    "metadata": {},
    "source": [
-    "## **Dense vs. Mixture-of-Experts**\n",
+    "# **5. Dense vs. Mixture-of-Experts**\n",
     "\n",
     "<img src=\"fig_dense_vs_moe.png\" width=\"950\" style=\"display:block;margin:1.2em auto;\">\n",
     "\n",
     "- **Dense** — every parameter runs for every token.\n",
-    "- **MoE** — a router wakes only a few \"experts\": **total** parameters ≫ **active** parameters\n",
-    "  (DeepSeek-V3: 671 B total, 37 B active per token).\n",
-    "- That is how \"huge model\" and \"fast and cheap\" can be true at the same time.\n",
-    "- It matters if you run models yourself: MoE needs the *memory* of a huge model but the *compute*\n",
-    "  of a small one."
+    "- **MoE** — a router wakes a few experts: **total** parameters ≫ **active** parameters\n",
+    "  (DeepSeek-V3: 671 B total, 37 B active).\n",
+    "- Matters for local models: MoE needs the *memory* of a huge model but the *compute* of a small one."
    ]
   },
   {
@@ -135,30 +134,14 @@
    "id": "f3756381",
    "metadata": {},
    "source": [
-    "## **Multimodality**\n",
+    "# **6. Multimodality**\n",
     "\n",
     "<img src=\"fig_multimodal.png\" width=\"950\" style=\"display:block;margin:1.2em auto;\">\n",
     "\n",
-    "- Images and audio are cut up and encoded into the same sequence of tokens as the text.\n",
+    "- Images and audio become tokens in the same sequence as text.\n",
     "- So: paste a plot, a screenshot of a traceback, a photo of the whiteboard.\n",
-    "- Images cost tokens too (~1–2 k for a screenshot). If you want a figure back, ask for\n",
-    "  **matplotlib code**, not an image."
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "c3934c79",
-   "metadata": {
-    "jp-MarkdownHeadingCollapsed": true
-   },
-   "source": [
-    "## **Agent**\n",
-    "\n",
-    "<img src=\"fig_agent_loop.png\" width=\"950\" style=\"display:block;margin:1.2em auto;\">\n",
-    "\n",
-    "- **Agent = model + tools + a loop**, running until it decides it is done.\n",
-    "- The point is **feedback**: it can run the code, read the error, fix it, run again.\n",
-    "- So always give it something to check against — a test, a plot, a known limit."
+    "- Images cost tokens too (~1–2 k for a screenshot). For figures, ask for **matplotlib code**, not an\n",
+    "  image."
    ]
   },
   {
@@ -166,7 +149,7 @@
    "id": "06cf3164",
    "metadata": {},
    "source": [
-    "## **Context window**\n",
+    "# **7. Context window**\n",
     "\n",
     "<img src=\"fig_context_window.png\" width=\"950\" style=\"display:block;margin:1.2em auto;\">\n",
     "\n",
@@ -178,10 +161,28 @@
   },
   {
    "cell_type": "markdown",
+   "id": "ba77a2cc",
+   "metadata": {},
+   "source": [
+    "# **8. Memory & RAG**\n",
+    "\n",
+    "<img src=\"fig_memory.png\" width=\"950\" style=\"display:block;margin:1.2em auto;\">\n",
+    "\n",
+    "- Session memory = the transcript; when it overflows it is **compacted** into a summary.\n",
+    "- Long-term memory = a **file** (`AGENTS.md`, notes, your repo) that gets read back in.\n",
+    "\n",
+    "<img src=\"fig_rag.png\" width=\"950\" style=\"display:block;margin:1.2em auto;\">\n",
+    "\n",
+    "- **RAG** — search your documents, paste the best chunks into the prompt. Good for papers and\n",
+    "  manuals; for code, an agent with `grep` usually wins."
+   ]
+  },
+  {
+   "cell_type": "markdown",
    "id": "cba65dc3",
    "metadata": {},
    "source": [
-    "## **Tools (function calling)**\n",
+    "# **9. Tools (function calling)**\n",
     "\n",
     "A tool = a **JSON description** sent with the prompt + **your function** that does the work.\n",
     "\n",
@@ -196,35 +197,22 @@
     "- The model **cannot run anything** — it only emits *\"call `run_bash` with `{\"command\": \"ls\"}`\"*.\n",
     "  Your code decides whether to obey.\n",
     "- The description *is* a prompt: badly described tools are badly used.\n",
-    "- **MCP (Model Context Protocol)** — an open standard for shipping tools as reusable servers (lecture 3).\n",
+    "- **MCP** — an open standard for shipping tools as reusable servers (lecture 3).\n",
     "- Security is yours: a bash tool runs with your permissions."
    ]
   },
   {
    "cell_type": "markdown",
-   "id": "a69b6c0b-bfed-494e-8a9b-6e40938ab56b",
+   "id": "c3934c79",
    "metadata": {},
    "source": [
-    "## **RAG (Retrieval-Augmented Generation)**\n",
+    "# **10. Agent**\n",
     "\n",
-    "<img src=\"fig_rag.png\" width=\"950\" style=\"display:block;margin:1.2em auto;\">\n",
+    "<img src=\"fig_agent_loop.png\" width=\"950\" style=\"display:block;margin:1.2em auto;\">\n",
     "\n",
-    "- **RAG** — search your documents, paste the best chunks into the prompt. Good for papers and\n",
-    "  manuals; for code, an agent with `grep` usually wins.\n",
-    "  - docs, website, your code"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "ba77a2cc",
-   "metadata": {},
-   "source": [
-    "## **Memory**\n",
-    "\n",
-    "<img src=\"fig_memory.png\" width=\"950\" style=\"display:block;margin:1.2em auto;\">\n",
-    "\n",
-    "- Session memory = the transcript; when it overflows it is **compacted** into a summary.\n",
-    "- Long-term memory = a **file** (`AGENTS.md`, notes, your repo) that gets read back in."
+    "- **Agent = model + tools + a loop**, running until it decides it is done.\n",
+    "- The point is **feedback**: it can run the code, read the error, fix it, run again.\n",
+    "- So always give it something to check against — a test, a plot, a known limit."
    ]
   },
   {
@@ -232,7 +220,7 @@
    "id": "cc3bea56",
    "metadata": {},
    "source": [
-    "## **Harness**\n",
+    "# **11. Harness**\n",
     "\n",
     "<img src=\"fig_harness.png\" width=\"950\" style=\"display:block;margin:1.2em auto;\">\n",
     "\n",
@@ -240,7 +228,7 @@
     "- Codex CLI, Claude Code, Copilot, Cursor, Warp — same picture, different ergonomics.\n",
     "- The harness decides what the model sees and may do, so it matters as much as the model.\n",
     "\n",
-    "**More next week - we will install Codex**"
+    "**Next week:** models and pricing, then we install one."
    ]
   },
   {
@@ -253,31 +241,26 @@
     "| term | one line |\n",
     "|---|---|\n",
     "| token | chunk of characters the model reads and writes; ~4 characters |\n",
-    "| weights / parameters | the frozen numbers that *are* the model |\n",
-    "| autoregression | appending each new token to the input and running the model again |\n",
+    "| weights / parameters | the ~10¹¹ frozen numbers that *are* the model |\n",
     "| temperature | how adventurous the sampling is; 0 = most likely token |\n",
     "| context window | everything the model can see in this one call |\n",
     "| context engineering | deciding what goes into that window |\n",
     "| system prompt | instructions placed at the top of the context |\n",
     "| knowledge cutoff | date after which the model has seen nothing |\n",
     "| hallucination | fluent, plausible, wrong — the default failure mode |\n",
-    "| reasoning model | trained to think at length, in tokens, before answering |\n",
+    "| reasoning model | trained to think at length before answering |\n",
     "| dense / MoE | all parameters per token vs. a router picking a few experts |\n",
     "| multimodal | images and audio encoded as tokens too |\n",
     "| tool / function call | JSON description + your function; the model only *requests* it |\n",
-    "| MCP | Model Context Protocol, open standard for shipping tools as servers |\n",
+    "| MCP | open standard for shipping tools as servers |\n",
     "| RAG | retrieve chunks from your documents, paste them into the prompt |\n",
     "| agent | model + tools + loop |\n",
     "| harness | the program that builds the context and runs the loop |\n",
-    "| compaction | summarising an overflowing session so it fits again |"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "c71eb1fc-1d20-4dfe-b9da-c5bb88021eea",
-   "metadata": {},
-   "source": [
-    "## **[OpenAI playground](https://platform.openai.com/chat)** "
+    "| compaction | summarising an overflowing session so it fits again |\n",
+    "\n",
+    "---\n",
+    "\n",
+    "Theory over — from here on, code."
    ]
   },
   {
@@ -285,12 +268,12 @@
    "id": "71c9a323-8692-4910-bcee-b364d5261fcd",
    "metadata": {},
    "source": [
-    "## **OpenAI API**"
+    "# **OpenAI API**"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": 1,
    "id": "7087431b-39a3-43ae-90b4-af93bb54655c",
    "metadata": {
     "tags": []
@@ -403,7 +386,7 @@
    "id": "d091373f-49b0-404c-b885-03f3b361afd9",
    "metadata": {},
    "source": [
-    "## **Simple chatbot**"
+    "# **Simple chatbot**"
    ]
   },
   {
@@ -483,7 +466,7 @@
    "id": "e31d4140-076c-4890-a63b-b28dcb1d345d",
    "metadata": {},
    "source": [
-    "## **Reasoning model**"
+    "# **Reasoning model**"
    ]
   },
   {
@@ -603,7 +586,7 @@
    "id": "62b2341a-2b9a-45d9-afc6-35ad09a0e823",
    "metadata": {},
    "source": [
-    "## **Simple AI agent**\n",
+    "# **Simple AI agent**\n",
     "\n",
     "                 ┌──────────────┐\n",
     "                 │     User     │\n",
@@ -927,10 +910,14 @@
     "import json\n",
     "import math\n",
     "import subprocess\n",
+    "\n",
     "from IPython.display import display, Markdown\n",
     "\n",
     "\n",
+    "# ============================================================\n",
     "# Calculator tool\n",
+    "# ============================================================\n",
+    "\n",
     "def calculate(expression):\n",
     "    # Demonstration only.\n",
     "    # A production implementation should use a proper safe expression parser.\n",
@@ -950,10 +937,17 @@
     "    )\n",
     "\n",
     "\n",
+    "# ============================================================\n",
     "# Bash tool\n",
+    "# ============================================================\n",
+    "\n",
     "def run_bash(command):\n",
     "    \"\"\"\n",
     "    Execute a bash command and return its output.\n",
+    "\n",
+    "    WARNING:\n",
+    "    This gives the LLM access to the local machine.\n",
+    "    This is suitable for demonstration purposes only.\n",
     "    \"\"\"\n",
     "\n",
     "    result = subprocess.run(\n",
@@ -962,19 +956,26 @@
     "        executable=\"/bin/bash\",\n",
     "        capture_output=True,\n",
     "        text=True,\n",
-    "        timeout=10)\n",
+    "        timeout=10\n",
+    "    )\n",
     "\n",
     "    output = \"\"\n",
+    "\n",
     "    if result.stdout:\n",
     "        output += result.stdout\n",
+    "\n",
     "    if result.stderr:\n",
     "        output += \"\\n[stderr]\\n\" + result.stderr\n",
+    "\n",
     "    output += f\"\\n[exit code: {result.returncode}]\"\n",
     "\n",
     "    return output\n",
     "\n",
     "\n",
+    "# ============================================================\n",
     "# Tools available to the agent\n",
+    "# ============================================================\n",
+    "\n",
     "tools = [\n",
     "    {\n",
     "        \"type\": \"function\",\n",
@@ -1017,7 +1018,10 @@
     "]\n",
     "\n",
     "\n",
+    "# ============================================================\n",
     "# Execute tools\n",
+    "# ============================================================\n",
+    "\n",
     "def execute_tool(name, arguments):\n",
     "    if name == \"calculate\":\n",
     "        return calculate(arguments[\"expression\"])\n",
@@ -1197,9 +1201,11 @@
    ]
   },
   {
-   "cell_type": "markdown",
+   "cell_type": "code",
+   "execution_count": null,
    "id": "74079560-fe81-4096-8d85-6a0b57727f89",
    "metadata": {},
+   "outputs": [],
    "source": []
   }
  ],
