@@ -1,4 +1,5 @@
 1. Introduction + OpenAI in Python + GitHub copilot first look
+	- Foreword (Tereza)
 	- we can start with News (Navier-Stokes?)
 	- students will introduce themselves
 	- Jupyter notebook: multimodality, Dense vs MoE, tools, context, agents, harness
@@ -10,18 +11,26 @@
 	- model comparison and pricing (reasoning effort)
 	- planning phase (ideally most advanced model) - you will never one-shot a problem
 	- prompt writing tips (English - do not waste tokens, but locality - Czech things in Czech)
+		- cases when good prompting really matters
 	- CLI vs GUI versions (long-term memory)
+	- simple coding problems
 
 3. Tour de Tools / Harnesses (Codex, Claude Code, Github Copilot, Warp - MCP, REPL)
+	- Warp - show own astro MCP server - for a list of galaxies.csv get redshift
+	- specialized problem
 
 4. Ollama + OpenWebUI + OpenWeight models + Local models + MUNI AI (GLM-5.3 and Kimi-K3), Hermes, Opencode
+	- subgroups - compare frontier $$ models vs openweight models
 
 5. Equation-dominated AI use (axioms + algebra -> Lean) 
 
-6. Student projects - till end of semester
+6. Openclaw + Telegram
+	- two bots talking to each other
+	- Own blog for news?
 
 
-?. Openclaw + Whatsap - Own blog for news?
+7. Student projects - till end of semester
+
 
 
 - first 5 minutes for news?
