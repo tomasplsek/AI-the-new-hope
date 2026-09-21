@@ -10,7 +10,10 @@
 	- codex installation and setup
 	- model comparison and pricing (reasoning effort)
 	- planning phase (ideally most advanced model) - you will never one-shot a problem
-	- prompt writing tips (English - do not waste tokens, but locality - Czech things in Czech)
+	- prompt writing tips 
+		- English - do not waste tokens, but locality - Czech things in Czech
+		- don't use "can you?" or "please"
+		- be careful when asking (with no intent to make changes or run code), the agent might interpret is as instructions 
 		- cases when good prompting really matters
 	- CLI vs GUI versions (long-term memory)
 	- simple coding problems
