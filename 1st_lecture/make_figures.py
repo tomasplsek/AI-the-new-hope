@@ -110,14 +110,13 @@ def save(fig, name):
 # 1. next-token prediction
 # ======================================================================
 def fig_next_token():
-    fig, ax = canvas(11, 5.6)
+    fig, ax = canvas(11, 5.25)
     top = ax.get_ylim()[1]
-    title(ax, "Guessing the next token",
-          "…and then it does it again, with its own guess appended to the input.")
+    title(ax, "Guessing the next token")
 
     toks = ["The", " virial", " theorem", " relates", " kinetic", " and"]
     x = 6.0
-    y = top - 15
+    y = top - 12
     for t in toks:
         w = 2.6 + 1.62 * len(t)
         box(ax, x, y, w, 4.4, t.strip(), color=BLUE, fs=9.5)
@@ -293,10 +292,9 @@ def fig_dense_vs_moe():
 # 4. the context window
 # ======================================================================
 def fig_context_window():
-    fig, ax = canvas(11, 3.75)
+    fig, ax = canvas(11, 3.55)
     top = ax.get_ylim()[1]
-    title(ax, "The context window: everything the model can see, right now",
-          "One API call = one flat pile of tokens. There is no memory anywhere else.")
+    title(ax, "The context window: everything the model can see, right now")
 
     segs = [
         ("system prompt\n& rules", 7, BLUE),
@@ -476,10 +474,9 @@ def fig_tokens():
 # 9. the agent loop
 # ======================================================================
 def fig_agent_loop():
-    fig, ax = canvas(11, 3.65)
+    fig, ax = canvas(11, 3.35)
     top = ax.get_ylim()[1]
-    title(ax, "An agent = the same LLM, called in a loop, with tools",
-          "The model only writes text. The harness is what reads that text and acts on it.")
+    title(ax, "Agent = LLM, called in a loop, with tools")
 
     y1 = 13.5
     box(ax, 1.5, y1, 12, 7.5, "you", color=INK2, face=SURFACE, fs=10, weight="bold")
