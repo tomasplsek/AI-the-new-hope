@@ -6,26 +6,37 @@
 	- OpenAI playground (for gpt-4o, one can set temperature)
 	- GitHub copilot first look
 
+
 2. Models and pricing (OpenAI), Codex intro + installation & setup
-	- codex installation and setup
-	- model comparison and pricing (reasoning effort)
+	- model routing
 	- planning phase (ideally most advanced model) - you will never one-shot a problem
+
 	- prompt writing tips 
 		- English - do not waste tokens, but locality - Czech things in Czech
 		- don't use "can you?" or "please"
 		- be careful when asking (with no intent to make changes or run code), the agent might interpret is as instructions 
 		- cases when good prompting really matters
-	- CLI vs GUI versions (long-term memory)
+
+	- GitHub, GitHub copilot, GitHub VS Code online
+	- model comparison and pricing (reasoning effort)
+
 	- simple coding problems
 
+
 3. Tour de Tools / Harnesses (Codex, Claude Code, Github Copilot, Warp - MCP, REPL)
+	- Codex installation and setup
+		- CLI vs GUI versions
+	- Claude
 	- Warp - show own astro MCP server - for a list of galaxies.csv get redshift
 	- specialized problem
+
 
 4. Ollama + OpenWebUI + OpenWeight models + Local models + MUNI AI (GLM-5.3 and Kimi-K3), Hermes, Opencode
 	- subgroups - compare frontier $$ models vs openweight models
 
+
 5. Equation-dominated AI use (axioms + algebra -> Lean) 
+
 
 6. Openclaw + Telegram
 	- two bots talking to each other
