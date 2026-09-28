@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Model routing, planning and prompting</title>
+<style>
+  @page {
+    size: 338mm 190mm;            /* 16:9 slide */
+    margin: 11mm 14mm 9mm 14mm;
+    background: #fcfcfb;
+  }
+  html { background: #fcfcfb; }
+  body {
+    font-family: "DejaVu Sans", sans-serif;
+    color: #0b0b0b;
+    margin: 0;
+    font-size: 10.3pt;
+    line-height: 1.38;
+  }
+  section { page-break-after: always; }
+  section:last-child { page-break-after: auto; }
+
+  h2 {
+    font-size: 19.5pt;
+    margin: 0 0 2mm 0;
+    letter-spacing: -0.2pt;
+  }
+  p.sub {
+    margin: 0 0 2.5mm 0;
+    color: #52514e;
+    font-size: 10.5pt;
+  }
+  /* width:auto + height:auto keeps the aspect ratio - never set width AND max-height */
+  img {
+    display: block;
+    height: 90mm;          /* width:auto keeps the aspect ratio */
+    width: auto;
+    max-width: 100%;
+    margin: 1mm auto 4mm auto;
+  }
+  img.sm { height: 88mm; }
+  img.sm2 { height: 92mm; }
+  ul { margin: 0; padding-left: 5.5mm; }
+  li { margin: 0 0 3.2mm 0; }
+  li::marker { color: #9b9a92; }
+  code {
+    font-family: "DejaVu Sans Mono", monospace;
+    font-size: 9.4pt;
+    background: #f1f0ec;
+    padding: 0 0.6mm;
+  }
+  .note { color: #52514e; }
+  .o { color: #eb6834; }
+  .v { color: #4a3aa7; }
+  .a { color: #1baf7a; }
+  .r { color: #e34948; }
+
+  /* news slide: bullets left, channel screenshots right */
+  .two-col { display: flex; gap: 9mm; }
+  .two-col .left { flex: 1; }
+  .two-col .right { width: 99mm; flex: none; }
+  .two-col .right figure { margin: 0 0 5mm 0; }
+  .two-col .right img {
+    height: auto; width: 100%; max-height: none; margin: 0;
+    border: 0.8pt solid #d8d7d1; border-radius: 1.5mm;
+  }
+  a { color: inherit; text-decoration: none; }
+  .two-col .right figcaption { margin-bottom: 2.2mm; font-size: 10.6pt; color: #52514e; line-height: 1.35; }
+  .two-col .right b { color: #0b0b0b; }
+  ul.tight > li { margin: 7mm 0 0 0; font-size: 10.6pt; }
+  ul.tight > li:first-child { margin-top: 0; }
+  ul.who { margin: 2.2mm 0 0 0; padding-left: 4mm; list-style: none; }
+  ul.who li { margin: 0 0 1.1mm 0; font-size: 9.8pt; line-height: 1.32; }
+  ul.who .h { color: #2a78d6; font-weight: bold; }
+  ul.who .co { color: #52514e; }
+
+  /* project cards */
+  .grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5.5mm;
+    margin-top: 5mm;
+  }
+  .card {
+    box-sizing: border-box;
+    width: 152mm;
+    min-height: 133mm;
+    border: 1.2pt solid #2a78d6;
+    border-radius: 2mm;
+    background: #eaf2fd;
+    padding: 6mm 6.5mm 6mm 6.5mm;
+    font-size: 12.4pt;
+    line-height: 1.5;
+  }
+  .card h3 { font-size: 15pt; margin: 0 0 5.5mm 0; }
+  .card p { margin: 0 0 5mm 0; }
+  .card p:last-child { margin-bottom: 0; }
+  .card .k { color: #2a78d6; font-weight: bold; }
+  .card .opt { opacity: 0.55; }
+  .card.blank {
+    border-style: dashed;
+    border-color: #9b9a92;
+    background: #fcfcfb;
+    color: #9b9a92;
+  }
+  .card.blank h3 { color: #52514e; }
+  .card.blank .k { color: #9b9a92; }
+  p.foot { margin: 5mm 0 0 0; color: #52514e; }
+</style>
+
+<!-- ============================ slide 0 ============================ -->
+<section>
+  <h2>Where to get AI news</h2>
+  <p class="sub">The field moves weekly, and none of it reaches you through journals in time. Follow people, not hashtags.</p>
+
+  <div class="two-col">
+    <div class="left">
+      <ul class="tight">
+        <li><b>X / Twitter</b> &mdash; still where things break first: model launches, papers, jailbreaks, the honest post-mortems.
+          <ul class="who">
+            <li><a href="https://x.com/karpathy"><span class="h">@karpathy</span></a> &nbsp;Andrej Karpathy
+                <span class="co">(Anthropic; ex-OpenAI, ex-Tesla)</span> &mdash; how the models actually work</li>
+            <li><a href="https://x.com/ylecun"><span class="h">@ylecun</span></a> &nbsp;Yann LeCun
+                <span class="co">(AMI Labs; ex-Meta)</span> &mdash; the loudest sceptic on what LLMs cannot do</li>
+            <li><a href="https://x.com/rasbt"><span class="h">@rasbt</span></a> &nbsp;Sebastian Raschka
+                <span class="co">(independent; ex-Lightning AI)</span> &mdash; implementation-level explainers, from scratch</li>
+            <li><a href="https://x.com/simonw"><span class="h">@simonw</span></a> &nbsp;Simon Willison
+                <span class="co">(co-creator of Django)</span> &mdash; tries every tool the day it ships</li>
+            <li><a href="https://x.com/steipete"><span class="h">@steipete</span></a> &nbsp;Peter Steinberger
+                <span class="co">(OpenClaw)</span> &mdash; agent setups and harness tricks</li>
+            <li><a href="https://x.com/sama"><span class="h">@sama</span></a> &nbsp;Sam Altman
+                <span class="co">(OpenAI)</span> &mdash; the labs announce here first; read the rest as positioning</li>
+            <li><a href="https://x.com/DarioAmodei"><span class="h">@DarioAmodei</span></a> &nbsp;Dario Amodei
+                <span class="co">(Anthropic; ex-OpenAI)</span> &mdash; long essays on where he thinks this goes</li>
+            <li><a href="https://x.com/pesvklobouku"><span class="h">@pesvklobouku</span></a> &nbsp;Jakub Čížek
+                <span class="co">(VTM.cz, dříve Živě.cz)</span> &mdash; česky a srozumitelně</li>
+            <li><a href="https://x.com/kasikp"><span class="h">@kasikp</span></a> &nbsp;Pavel Kasík
+                <span class="co">(Seznam Zprávy)</span> &mdash; česky, a s ověřováním hype</li>
+          </ul>
+        </li>
+        <li><b>Newsletters</b>
+          <ul class="who">
+            <li><a href="https://www.deeplearning.ai/the-batch/"><span class="h">The Batch</span></a>
+                <span class="co">(Andrew Ng, DeepLearning.AI)</span> &mdash; plain weekly roundup, no hype dialect</li>
+            <li><a href="https://www.aisnakeoil.com/"><span class="h">AI Snake Oil</span></a>
+                <span class="co">(Narayanan &amp; Kapoor, Princeton)</span> &mdash; academics taking the claims apart</li>
+          </ul>
+        </li>
+        <li><b>Benchmarks</b>
+          <ul class="who">
+            <li><a href="https://artificialanalysis.ai/evaluations"><span class="h">artificialanalysis.ai</span></a>
+                &mdash; quality, price and speed of every model side by side</li>
+            <li><a href="https://www.tbench.ai/"><span class="h">tbench.ai</span></a>
+                &mdash; Terminal-Bench: agents doing real work in a terminal</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="right">
+      <figure>
+        <figcaption><a href="https://www.youtube.com/@Fireship"><b>Fireship</b></a> &mdash; <i>The Code Report</i>:
+          ~5 minutes, sarcastic, catches everything that happened this week.</figcaption>
+        <a href="https://www.youtube.com/@Fireship"><img src="fireship_crop.jpg" alt="Fireship - The Code Report"></a>
+      </figure>
+      <figure>
+        <figcaption><a href="https://www.youtube.com/@sentdex"><b>sentdex</b></a> &mdash; long-form Python and ML:
+          local models, harnesses, benchmarks run by hand.</figcaption>
+        <a href="https://www.youtube.com/@sentdex"><img src="sentdex_crop.jpg" alt="sentdex"></a>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ slide 1 ============================ -->
+<section>
+  <h2>Model routing &mdash; the &ldquo;Auto&rdquo; model</h2>
+  <p class="sub">One prompt in &mdash; and something outside the model decides which model actually answers it.</p>
+  <img class="sm" src="fig_model_routing.png" alt="model routing">
+  <ul>
+    <li>Copilot, Cursor and others offer <b>Auto</b>: you do not choose the model, a <b class="o">router</b> does &mdash; per request.
+        A cheap classifier <b>outside</b> the model, reading the surface of your prompt; it has not thought about your problem.</li>
+    <li>Not the same router as in <b>MoE</b> (lecture 1): that one picks <i>experts inside one model</i>, per token, and was trained.
+        This one picks <i>a whole model</i>, per request &mdash; a pricing decision.</li>
+    <li><b>Plan first &mdash; you will not one-shot a real problem.</b> Ask the strongest model for a numbered plan and nothing else
+        (<i>&ldquo;do not change any files yet&rdquo;</i>), read it like a referee, keep it in <code>plan.md</code>, then spend one cheap prompt per step.
+        That planning turn is where the 10&times; multiplier pays for itself.</li>
+  </ul>
+</section>
+
+<!-- ============================ slide 2 ============================ -->
+<section>
+  <h2>Prompting tips</h2>
+  <p class="sub">The model cannot see your screen, your data, or what you meant. Everything it knows about your problem, you put there.</p>
+  <img class="sm2" src="fig_prompt_anatomy.png" alt="anatomy of a prompt">
+  <ul>
+    <li><b>Write in English</b> &mdash; fewer tokens per word, better-trained behaviour &mdash; but keep local things local: Czech comments, labels and column names where they belong.</li>
+    <li><b>Drop the politeness.</b> &ldquo;Could you please&hellip;&rdquo;, &ldquo;I was wondering if&hellip;&rdquo; are tokens, not manners. Imperative, then the facts.</li>
+    <li><b>A question can be read as an order.</b> <i>&ldquo;Why is this loop so slow?&rdquo;</i> will get you a rewritten loop. If you only want an answer, say <b>&ldquo;do not change any files, just explain&rdquo;</b>.</li>
+    <li><b>Paste the real thing</b> &mdash; the command and the whole traceback, not your summary. Say what you already tried, or it will try it again.</li>
+    <li><b>Say what must not change</b> &mdash; &ldquo;keep the query&rdquo;, &ldquo;do not touch the tests&rdquo;. Everything you do not fence off is fair game.</li>
+    <li><b>One task per conversation.</b> Stale context from the previous problem is the most common cause of a stupid answer &mdash; start a new chat when you switch tasks.</li>
+  </ul>
+</section>
+
+<!-- ============================ slide 3 ============================ -->
+<section>
+  <h2>Short projects</h2>
+
+  <div class="grid">
+    <div class="card">
+      <h3>1 &nbsp;Open clusters with Gaia DR3</h3>
+      <p><span class="k">data:</span> &nbsp;Gaia DR3 cone searches for <b>Pleiades</b>, <b>Praesepe</b> and <b>M67</b>
+         (<code>astroquery.gaia</code>, table <code>gaia_source_lite</code>)</p>
+      <p><span class="k">do:</span> &nbsp;plot the proper motions, <b>cluster</b> the stars in (<i>pmra</i>, <i>pmdec</i>, parallax)
+         to pick the members, then the HR diagram of each cluster and the age ordering from the turn-off</p>
+      <p><span class="k">deliver:</span> &nbsp;proper-motion diagram + HR diagram per cluster, member counts, distances,
+         and the three clusters ordered by age</p>
+      <p class="opt"><span class="k">optional:</span> &nbsp;isochrone fitting for a real age</p>
+    </div>
+
+    <div class="card blank">
+      <h3>2 &nbsp;Theoretical physics &mdash; to be announced</h3>
+      <p><span class="k">data:</span> &nbsp;&mdash;</p>
+      <p><span class="k">do:</span> &nbsp;&mdash;</p>
+      <p><span class="k">deliver:</span> &nbsp;&mdash;</p>
+    </div>
+  </div>
+
+</section>
