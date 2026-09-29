@@ -23,7 +23,12 @@
 	- simple coding problems
 
 
-3. Tour de Tools / Harnesses (Codex, Claude Code, Github Copilot, Warp - MCP, REPL)
+3. Simple coding problem
+	- news
+	- astro or theor.physics
+
+
+4. Tour de Tools / Harnesses (Codex, Claude Code, Github Copilot, Warp - MCP, REPL)
 	- Codex installation and setup
 		- CLI vs GUI versions
 	- Claude
@@ -31,7 +36,7 @@
 	- specialized problem
 
 
-4. Ollama + OpenWebUI + OpenWeight models + Local models + MUNI AI (GLM-5.3 and Kimi-K3), Hermes, Opencode
+5. Ollama + OpenWebUI + OpenWeight models + Local models + MUNI AI (GLM-5.3 and Kimi-K3), Hermes, Opencode
 	- subgroups - compare frontier $$ models vs openweight models
 
 

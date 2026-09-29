@@ -82,7 +82,8 @@ def update(val):
 
 mass_slider.on_changed(update)
 
-output = "virial_velocity_profile.png"
+output = os.path.normpath(os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "..", "figures", "virial_velocity_profile.png"))
 fig.savefig(output, dpi=150, bbox_inches="tight")
 print(f"Saved initial plot to {output}")
 

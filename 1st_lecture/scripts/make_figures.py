@@ -1,11 +1,13 @@
 """Schematic figures for lecture 1 (Introduction to AI).
 
-Run once to (re)generate all `fig_*.png` used by 01_introduction.ipynb:
+Run once to (re)generate all `figures/fig_*.png` used by 01_introduction.ipynb:
 
-    python3 make_figures.py
+    python3 scripts/make_figures.py
 
 Everything here is a hand-drawn schematic - no real data, no network access.
 """
+
+import os
 
 import matplotlib
 
@@ -19,6 +21,10 @@ from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 # ----------------------------------------------------------------------
 # palette (validated, colourblind-safe categorical order)
 # ----------------------------------------------------------------------
+# all images live in 1st_lecture/figures, next to this scripts/ folder
+FIGDIR = os.path.normpath(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "figures"))
+
 SURFACE = "#fcfcfb"
 INK = "#0b0b0b"
 INK2 = "#52514e"
@@ -101,6 +107,8 @@ def title(ax, text, sub=None):
 
 
 def save(fig, name):
+    os.makedirs(FIGDIR, exist_ok=True)
+    name = os.path.join(FIGDIR, name)
     fig.savefig(name)
     plt.close(fig)
     print("wrote", name)

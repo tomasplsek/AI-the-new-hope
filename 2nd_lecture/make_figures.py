@@ -21,6 +21,8 @@ from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 # ----------------------------------------------------------------------
 # palette (same as lecture 1)
 # ----------------------------------------------------------------------
+FIGDIR = "figures"          # all images live here
+
 SURFACE = "#fcfcfb"
 INK = "#0b0b0b"
 INK2 = "#52514e"
@@ -101,6 +103,8 @@ def title(ax, text, sub=None):
 
 
 def save(fig, name):
+    os.makedirs(FIGDIR, exist_ok=True)
+    name = os.path.join(FIGDIR, name)
     fig.savefig(name)
     plt.close(fig)
     print("wrote", name)
@@ -330,7 +334,7 @@ def crop_screenshots():
     from PIL import Image
 
     for name, cut in [("fireship", 690), ("sentdex", 655)]:
-        src = f"{name}.png"
+        src = os.path.join(FIGDIR, f"{name}.png")
         if not os.path.exists(src):
             print("skipping", src, "(not here)")
             continue
@@ -338,8 +342,9 @@ def crop_screenshots():
         w, _ = im.size
         im = im.crop((0, 0, w, cut))
         im = im.resize((1100, round(1100 * cut / w)), Image.LANCZOS)
-        im.save(f"{name}_crop.jpg", quality=88, optimize=True)
-        print(f"wrote {name}_crop.jpg")
+        out = os.path.join(FIGDIR, f"{name}_crop.jpg")
+        im.save(out, quality=88, optimize=True)
+        print("wrote", out)
 
 
 if __name__ == "__main__":
