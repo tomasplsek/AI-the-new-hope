@@ -20,11 +20,4 @@ Slides: [`2nd_lecture.pdf`](2nd_lecture/2nd_lecture.pdf).
 agent on [open clusters in Gaia DR3](3rd_lecture/astro_task.pdf) or on the
 [quantum Ising transition](3rd_lecture/theor_problem.pdf).
 
-## Building the material
-
-```bash
-python3 1st_lecture/scripts/make_figures.py
-cd 2nd_lecture && python3 make_figures.py && weasyprint slides.html 2nd_lecture.pdf
-```
-
 [`plan.txt`](plan.txt) is the plan for the rest of the semester.
