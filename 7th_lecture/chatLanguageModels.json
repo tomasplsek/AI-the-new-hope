@@ -1,0 +1,20 @@
+[
+    {
+        "name": "eInfra",
+        "vendor": "customendpoint",
+        "apiKey": "${input:chat.lm.secret.-f8666f9}",
+        "apiType": "chat-completions",
+        "models": [
+            {
+                "id": "glm-5.3",
+                "name": "GLM-5.3 (eInfra)",
+                "url": "https://llm.ai.e-infra.cz/v1",
+                "toolCalling": true,
+                "vision": false,
+                "thinking": true,
+                "maxInputTokens": 128000,
+                "maxOutputTokens": 16000
+            }
+        ]
+    }
+]

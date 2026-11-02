@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Open-weight models</title>
+<style>
+  @page {
+    size: 338mm 190mm;            /* 16:9 slide */
+    margin: 11mm 14mm 9mm 14mm;
+    background: #fcfcfb;
+  }
+  html { background: #fcfcfb; }
+  body {
+    font-family: "DejaVu Sans", sans-serif;
+    color: #0b0b0b;
+    margin: 0;
+    font-size: 10.3pt;
+    line-height: 1.38;
+  }
+  section { page-break-after: always; }
+  section:last-child { page-break-after: auto; }
+
+  h2 {
+    font-size: 19.5pt;
+    margin: 0 0 2mm 0;
+    letter-spacing: -0.2pt;
+  }
+  p.sub {
+    margin: 0 0 2.5mm 0;
+    color: #52514e;
+    font-size: 10.5pt;
+  }
+  ul { margin: 0; padding-left: 5.5mm; }
+  li { margin: 0 0 3.2mm 0; }
+  li::marker { color: #9b9a92; }
+  code, pre {
+    font-family: "DejaVu Sans Mono", monospace;
+    font-size: 9.4pt;
+    background: #f1f0ec;
+  }
+  code { padding: 0 0.6mm; }
+  .note { color: #52514e; }
+  a { color: inherit; text-decoration: none; border-bottom: 0.8pt dotted #9b9a92; }
+  p.foot { margin: 5mm 0 0 0; color: #52514e; }
+
+  /* colour sets, used through var(--c) / var(--bg) */
+  .closed { --c: #9b9a92; --bg: #f4f3ef; }
+  .open   { --c: #2a78d6; --bg: #eaf2fd; }
+  .oss    { --c: #1baf7a; --bg: #e7f6ef; }
+  .t1 { --c: #1baf7a; --bg: #e7f6ef; }
+  .t2 { --c: #2a78d6; --bg: #eaf2fd; }
+  .t3 { --c: #4a3aa7; --bg: #efedf9; }
+  .t4 { --c: #eb6834; --bg: #fdf0ea; }
+
+  /* slide 1: spectrum + three columns + why/cost */
+  .spectrum { display: flex; margin-top: 5mm; }
+  .spectrum div {
+    flex: 1;
+    background: var(--c);
+    color: #fff;
+    font-weight: bold;
+    font-size: 10.5pt;
+    padding: 1.6mm 5mm;
+  }
+  .spectrum div:first-child { border-radius: 2mm 0 0 2mm; }
+  .spectrum div:last-child { border-radius: 0 2mm 2mm 0; }
+  .spectrum span { float: right; font-weight: normal; opacity: 0.85; }
+  .cols { display: flex; gap: 5mm; margin-top: 3mm; }
+  .col {
+    box-sizing: border-box;
+    flex: 1;
+    border: 1.2pt solid var(--c);
+    border-radius: 2mm;
+    background: var(--bg);
+    padding: 4.5mm 5.5mm;
+    font-size: 12.2pt;
+    line-height: 1.42;
+  }
+  .col h3 { font-size: 16pt; margin: 0 0 0.8mm 0; color: var(--c); }
+  .col .hw { color: #52514e; margin: 0 0 3.5mm 0; font-size: 10.8pt; }
+  .col p { margin: 0 0 2.6mm 0; padding-left: 6mm; text-indent: -6mm; }
+  .col p:last-child { margin-bottom: 0; }
+  .yes::before { content: "\2713"; display: inline-block; width: 6mm; text-indent: 0; color: #1baf7a; font-weight: bold; }
+  .no::before  { content: "\2717"; display: inline-block; width: 6mm; text-indent: 0; color: #e34948; font-weight: bold; }
+  .col p.fine { color: #52514e; font-size: 10.6pt; padding-left: 0; text-indent: 0; margin-top: 3mm; }
+
+  .why { display: flex; gap: 5mm; margin-top: 5mm; }
+  .why > div {
+    flex: 1;
+    border-radius: 2mm;
+    padding: 4mm 5.5mm;
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+  .why .pro { background: #e7f6ef; flex: 1.45; }
+  .why .con { background: #fbeaea; }
+  .why h4 { margin: 0 0 2mm 0; font-size: 12.6pt; }
+  .why .pro h4 { color: #1baf7a; }
+  .why .con h4 { color: #e34948; }
+  .why ul { padding-left: 5mm; }
+  .why li { margin: 0 0 1.2mm 0; }
+  .why .pro ul { columns: 2; column-gap: 8mm; }
+
+  /* slide 2: bar chart, log scale */
+  .chart { display: flex; gap: 4mm; margin-top: 4mm; }
+  .axis { width: 11mm; flex: none; }
+  .group { display: flex; flex-direction: column; }
+  .g1 { flex: 2; } .g2 { flex: 2; } .g3 { flex: 2; } .g4 { flex: 3; } .g5 { flex: 1.15; }
+  .bars, .axis .area {
+    position: relative;
+    height: 76mm;
+    display: flex;
+    align-items: flex-end;
+  }
+  .grid { position: absolute; left: 0; right: 0; border-top: 0.6pt dashed #d8d7d1; }
+  .axis .tick { position: absolute; right: 1.5mm; font-size: 8.6pt; color: #9b9a92; transform: translateY(50%); }
+  .bc { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
+  .bar {
+    width: 15mm;
+    background: var(--c);
+    border-radius: 1.2mm 1.2mm 0 0;
+  }
+  .bar.unknown {
+    box-sizing: border-box;
+    background: #f4f3ef;
+    border: 1.4pt dashed #9b9a92;
+    border-bottom: none;
+    color: #9b9a92;
+    font-size: 26pt;
+    font-weight: bold;
+    text-align: center;
+    padding-top: 18mm;
+  }
+  .lab { text-align: center; margin-bottom: 1.3mm; line-height: 1.22; }
+  .lab b { display: block; font-size: 12.5pt; }
+  .lab .gb { display: block; font-size: 10pt; color: #52514e; }
+  .lab .moe { display: block; font-size: 8.4pt; color: var(--c); }
+  .names { display: flex; border-top: 1.2pt solid #52514e; padding-top: 1.5mm; }
+  .names div { flex: 1; text-align: center; font-size: 9.8pt; line-height: 1.25; height: 9mm; }
+  .machine {
+    margin-top: 2mm;
+    border-top: 2.4pt solid var(--c);
+    padding-top: 2mm;
+    font-size: 10.4pt;
+    line-height: 1.35;
+    color: #52514e;
+  }
+  .machine b { color: var(--c); font-size: 11.6pt; display: block; margin-bottom: 0.5mm; }
+
+  /* slide 3 */
+  .two-col { display: flex; gap: 10mm; }
+  .two-col .left { flex: 1; }
+  .two-col .right { width: 112mm; flex: none; }
+  .s3 .left { padding-top: 7mm; }
+  .s4 .left { padding-top: 3.5mm; }
+  ul.tight > li { margin: 7mm 0 0 0; font-size: 13.4pt; }
+  .s3 ul.tight > li { margin-top: 10mm; }
+  .s3 ul.tight > li:first-child { margin-top: 0; }
+  .s3 ul.sub2 li { margin-bottom: 3.2mm; }
+  ul.tight > li:first-child { margin-top: 0; }
+  ul.sub2 { margin: 2.5mm 0 0 0; padding-left: 4mm; }
+  ul.sub2 li { margin: 0 0 2.4mm 0; font-size: 12pt; line-height: 1.42; }
+  ul.sub2 code { font-size: 10.4pt; }
+  .box {
+    border: 1.2pt solid var(--c);
+    background: var(--bg);
+    border-radius: 2mm;
+    padding: 3.5mm 4.5mm;
+    font-size: 12pt;
+  }
+  .box b { color: var(--c); }
+  .box .p { float: right; font-family: "DejaVu Sans Mono", monospace; font-size: 9.6pt; color: #52514e; }
+  .arrow { text-align: center; color: #9b9a92; font-size: 14pt; margin: 0.6mm 0; line-height: 1; }
+  .row { display: flex; gap: 4mm; }
+  .row .box { flex: 1; }
+
+  /* slide 4 */
+  ol.steps { margin: 0; padding-left: 6mm; }
+  ol.steps > li { margin: 0 0 6mm 0; font-size: 13pt; line-height: 1.42; }
+  ol.steps > li::marker { color: #2a78d6; font-weight: bold; }
+  pre {
+    margin: 0;
+    padding: 3.5mm 4mm;
+    border-radius: 1.5mm;
+    font-size: 9.6pt;
+    line-height: 1.22;
+    white-space: pre;
+  }
+  pre .c { color: #9b9a92; }
+  pre .h { color: #2a78d6; font-weight: bold; }
+  pre .key { color: #e34948; background: #fbeaea; outline: 1pt solid #e34948; }
+  /* sits over the JSON but comes after it in the document, so copying the JSON does not pick it up */
+  .keynote {
+    position: absolute; top: 18.6mm; right: 4mm; width: 46mm;
+    color: #e34948; font-size: 9.6pt; line-height: 1.25;
+  }
+  .keynote b { font-size: 13pt; vertical-align: -1pt; }
+  .gotcha { margin-top: 7mm; font-size: 11.4pt; color: #52514e; }
+  .gotcha li { margin: 0 0 2.6mm 0; }
+  .gotcha b { color: #0b0b0b; }
+</style>
+
+<!-- ============================ slide 1 ============================ -->
+<section>
+  <h2>Recap: closed, open-weight, open-source</h2>
+  <p class="sub">&ldquo;Open&rdquo; is used loosely. What matters is what you actually get to download.</p>
+
+  <div class="spectrum">
+    <div class="closed">you get: an API</div>
+    <div class="open">+ the trained weights</div>
+    <div class="oss">+ training code and data</div>
+  </div>
+
+  <div class="cols">
+    <div class="col closed">
+      <h3>Closed</h3>
+      <p class="hw">GPT &middot; Claude &middot; Gemini</p>
+      <p class="yes">an API and a chat app</p>
+      <p class="no">the model &mdash; it runs on their servers, and your data goes there</p>
+      <p class="no">control &mdash; versions change or get retired under you</p>
+    </div>
+    <div class="col open">
+      <h3>Open-weight</h3>
+      <p class="hw">Qwen &middot; DeepSeek &middot; Kimi &middot; GLM &middot; Mistral &middot; Gemma &middot; gpt-oss &middot; Llama</p>
+      <p class="yes">the trained weights &mdash; run, quantize, fine-tune anywhere</p>
+      <p class="no">training data and code &mdash; you can run it, not rebuild it</p>
+      <p class="fine">Licences vary: Apache&nbsp;2.0 / MIT, or custom ones with restrictions (Llama, Gemma).</p>
+    </div>
+    <div class="col oss">
+      <h3>Open-source</h3>
+      <p class="hw">OLMo (Ai2) &middot; Pythia (EleutherAI)</p>
+      <p class="yes">weights + training code + data &mdash; reproducible from scratch</p>
+      <p class="no">rare, and behind the best open-weight models</p>
+      <p class="fine">Most &ldquo;open-source LLMs&rdquo; in the news are really open-weight.</p>
+    </div>
+  </div>
+
+  <div class="why">
+    <div class="pro">
+      <h4>Why run open models</h4>
+      <ul>
+        <li>data never leaves your machine</li>
+        <li>projects under <b>NDA</b> that forbid cloud AI</li>
+        <li>fixed version &rarr; reproducible results</li>
+        <li>no price per token</li>
+        <li>works offline and on HPC nodes</li>
+      </ul>
+    </div>
+    <div class="con">
+      <h4>The cost</h4>
+      <ul>
+        <li>you need the hardware</li>
+        <li>you do the setup and the updates</li>
+        <li>usually behind the best closed models</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ slide 2 ============================ -->
+<!-- Bar heights are log10(params in B) / log10(5000) * 58 mm.
+     GB = approximate size at 4-bit quantization (~0.6 GB per billion params). -->
+<section>
+  <h2>What runs where</h2>
+  <p class="sub">The whole model has to fit into memory &mdash; RAM, GPU memory or unified memory. Parameters on a log scale, size at 4-bit quantization.</p>
+
+  <div class="chart">
+    <div class="axis">
+      <div class="area">
+        <span class="tick" style="bottom:0">1 B</span>
+        <span class="tick" style="bottom:15.7mm">10 B</span>
+        <span class="tick" style="bottom:31.4mm">100 B</span>
+        <span class="tick" style="bottom:47mm">1 T</span>
+      </div>
+    </div>
+
+    <div class="group g1 t1">
+      <div class="bars">
+        <div class="grid" style="bottom:15.7mm"></div><div class="grid" style="bottom:31.4mm"></div><div class="grid" style="bottom:47mm"></div>
+        <div class="bc"><div class="lab"><b>4 B</b><span class="gb">2.8 GB</span></div><div class="bar" style="height:9.4mm"></div></div>
+        <div class="bc"><div class="lab"><b>12 B</b><span class="gb">~7 GB</span></div><div class="bar" style="height:16.9mm"></div></div>
+      </div>
+      <div class="names"><div>Nemotron 3 Nano</div><div>Gemma 4 12B</div></div>
+      <div class="machine"><b>Phone &middot; laptop</b>no GPU, 8&ndash;16 GB RAM<br>slow, but private</div>
+    </div>
+
+    <div class="group g2 t2">
+      <div class="bars">
+        <div class="grid" style="bottom:15.7mm"></div><div class="grid" style="bottom:31.4mm"></div><div class="grid" style="bottom:47mm"></div>
+        <div class="bc"><div class="lab"><b>21 B</b><span class="gb">~13 GB</span><span class="moe">MoE &middot; 3.6 B active</span></div><div class="bar" style="height:20.7mm"></div></div>
+        <div class="bc"><div class="lab"><b>27 B</b><span class="gb">~17 GB</span></div><div class="bar" style="height:22.4mm"></div></div>
+      </div>
+      <div class="names"><div>gpt-oss-20b</div><div>Qwen3.8 27B</div></div>
+      <div class="machine"><b>Gaming GPU</b>RTX 4090 / 5090, 24&ndash;32 GB<br>or a Mac with 32&ndash;64 GB</div>
+    </div>
+
+    <div class="group g3 t3">
+      <div class="bars">
+        <div class="grid" style="bottom:15.7mm"></div><div class="grid" style="bottom:31.4mm"></div><div class="grid" style="bottom:47mm"></div>
+        <div class="bc"><div class="lab"><b>117 B</b><span class="gb">~65 GB</span><span class="moe">MoE &middot; 5.1 B active</span></div><div class="bar" style="height:32.4mm"></div></div>
+        <div class="bc"><div class="lab"><b>128 B</b><span class="gb">~75 GB</span></div><div class="bar" style="height:33mm"></div></div>
+      </div>
+      <div class="names"><div>gpt-oss-120b</div><div>Mistral Medium 3.5</div></div>
+      <div class="machine"><b>Pro GPU &middot; DGX Spark</b>RTX PRO 6000, 96 GB<br>DGX Spark, 128 GB unified</div>
+    </div>
+
+    <div class="group g4 t4">
+      <div class="bars">
+        <div class="grid" style="bottom:15.7mm"></div><div class="grid" style="bottom:31.4mm"></div><div class="grid" style="bottom:47mm"></div>
+        <div class="bc"><div class="lab"><b>552 B</b><span class="gb">~330 GB</span><span class="moe">MoE &middot; 16 B active</span></div><div class="bar" style="height:42.9mm"></div></div>
+        <div class="bc"><div class="lab"><b>744 B</b><span class="gb">~450 GB</span><span class="moe">MoE &middot; 40 B active</span></div><div class="bar" style="height:45mm"></div></div>
+        <div class="bc"><div class="lab"><b>2.8 T</b><span class="gb">~1.7 TB</span><span class="moe">MoE &middot; 104 B active</span></div><div class="bar" style="height:54mm"></div></div>
+      </div>
+      <div class="names"><div>DeepSeek V4.1 Flash</div><div>GLM-5.3</div><div>Kimi K3</div></div>
+      <div class="machine"><b>Datacentre &middot; DGX B300</b>8 GPUs, ~2.3 TB of GPU memory in one node &mdash; you use these over an API</div>
+    </div>
+
+    <div class="group g5 closed">
+      <div class="bars">
+        <div class="grid" style="bottom:15.7mm"></div><div class="grid" style="bottom:31.4mm"></div><div class="grid" style="bottom:47mm"></div>
+        <div class="bc"><div class="lab"><b>?? B</b><span class="gb">not disclosed</span></div><div class="bar unknown" style="height:63mm">?</div></div>
+      </div>
+      <div class="names"><div>GPT &middot; Claude<br>Gemini</div></div>
+      <div class="machine"><b style="color:#52514e">Closed</b>their datacentres only</div>
+    </div>
+  </div>
+
+  <p class="foot"><b>Rule of thumb:</b> &nbsp;~0.6 GB per billion parameters at 4-bit, plus a few GB for the context.
+     &nbsp;<b>MoE:</b> all parameters must fit in memory, but only the active ones set the speed.</p>
+</section>
+
+<!-- ============================ slide 3 ============================ -->
+<section class="s3">
+  <h2>Running it yourself: Ollama + Open WebUI</h2>
+  <p class="sub">Two free tools turn a downloaded model into your own ChatGPT.</p>
+
+  <div class="two-col">
+    <div class="left">
+      <ul class="tight">
+        <li><a href="https://ollama.com"><b>Ollama</b></a> &mdash; downloads and runs open-weight models, on CPU, NVIDIA, AMD or Apple silicon
+          <ul class="sub2">
+            <li>install &mdash; Linux: <code>curl -fsSL https://ollama.com/install.sh | sh</code><br>
+                macOS / Windows: installer from <a href="https://ollama.com/download"><b>ollama.com/download</b></a></li>
+            <li><code>ollama pull qwen3.5</code> &nbsp;&rarr;&nbsp; <code>ollama run qwen3.5</code></li>
+            <li>models, already quantized: <a href="https://ollama.com/search"><b>ollama.com/search</b></a></li>
+            <li>API on <code>localhost:11434</code> for Python, VS Code, Open WebUI</li>
+          </ul>
+        </li>
+        <li><a href="https://github.com/open-webui/open-webui"><b>Open WebUI</b></a> &mdash; a ChatGPT-style web interface on top of Ollama
+          <ul class="sub2">
+            <li>chat history, documents, web search, multiple users</li>
+            <li>runs as a <b>Docker</b> container (or <code>pip install open-webui</code>)</li>
+            <li>point it at Ollama, open <a href="http://localhost:3000"><code>localhost:3000</code></a> in the browser</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="right">
+      <div class="box closed"><b style="color:#52514e">Large Language Model</b><br>e.g. qwen3.5 &mdash; a few GB file on your disk</div>
+      <div class="arrow">&darr;</div>
+      <div class="box t1"><b>Ollama</b> <span class="p">:11434</span><br>loads the model, runs it, serves the API</div>
+      <div class="arrow">&darr;</div>
+      <div class="box t3"><b>Open WebUI</b> <span class="p">:3000</span><br>interface, users, documents, web search</div>
+      <div class="arrow">&darr;</div>
+      <div class="row">
+        <div class="box t2"><b>Browser</b><br>you, chatting</div>
+        <div class="box t2"><b>VS Code</b><br>Copilot Chat</div>
+        <div class="box t2"><b>Warp, &hellip;</b><br>other harnesses</div>
+      </div>
+      <p class="note" style="margin-top:5mm; font-size:11pt;">VS Code can also skip Open WebUI and talk to Ollama directly (Ollama extension).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ slide 4 ============================ -->
+<section class="s4">
+  <h2>eInfra models in VS Code</h2>
+  <p class="sub">eInfra runs the big open-weight models for Czech academia. Copilot can use them as a <i>custom endpoint</i>.</p>
+
+  <div class="two-col">
+    <div class="left">
+      <ol class="steps">
+        <li><b>Get an API key:</b> &nbsp;<a href="https://chat.ai.e-infra.cz/"><code>chat.ai.e-infra.cz</code></a> &rarr; Settings &rarr; Account &rarr; API Keys</li>
+        <li><b>Add the endpoint:</b> &nbsp;Copilot Chat &rarr; model picker &rarr; <i>Manage Models</i> &rarr;
+            <i>Add Models&hellip;</i> &rarr; <b>Custom Endpoint</b>; name it <code>eInfra</code>, paste the key</li>
+        <li><b>Fill in the models:</b> &nbsp;VS Code opens <code>chatLanguageModels.json</code>
+            &mdash; keep its <code>apiKey</code> line, add one entry per model (right)</li>
+        <li><b>Use it:</b> &nbsp;the models appear on their own <b>eInfra</b> tab in the model picker</li>
+      </ol>
+
+      <ul class="gotcha">
+        <li><b><code>id</code></b> must match the server exactly &mdash; list them at <code>llm.ai.e-infra.cz/v1/models</code> (with your key)</li>
+        <li><b><code>vision</code>, <code>thinking</code>, token limits</b> &mdash; from the model card; too high a limit and long chats fail</li>
+        <li><b>Status</b> of all models: <a href="https://llm.ai.e-infra.cz/status/"><code>llm.ai.e-infra.cz/status</code></a></li>
+        <li><b>Your usage:</b> <a href="https://llm.ai.e-infra.cz/usage"><code>llm.ai.e-infra.cz/usage</code></a></li>
+      </ul>
+    </div>
+
+    <div class="right" style="width:146mm; position:relative">
+<pre>[
+  {
+    "name": "eInfra",
+    "vendor": "customendpoint",
+    "apiKey": <span class="key">"${input:chat.lm.secret.…}"</span>,
+    "apiType": "chat-completions",
+    "models": [
+      {
+        "id": <span class="h">"glm-5.3"</span>,
+        "name": "GLM-5.3 (eInfra)",
+        "url": "https://llm.ai.e-infra.cz/v1",
+        "toolCalling": true,
+        "vision": false,
+        "thinking": true,
+        "contextWindow": 1048576,
+        "maxOutputTokens": 32000
+      },
+      {
+        "id": <span class="h">"kimi-k3"</span>,
+        "name": "Kimi K3 (eInfra)",
+        "url": "https://llm.ai.e-infra.cz/v1",
+        "toolCalling": true,
+        "vision": true,
+        "thinking": true,
+        "contextWindow": 1048576,
+        "maxOutputTokens": 32000
+      }
+    ]
+  }
+]</pre>
+      <div class="keynote"><b>&larr;</b> user-specific: keep the <code>apiKey</code> line VS Code generated for you</div>
+    </div>
+  </div>
+</section>
