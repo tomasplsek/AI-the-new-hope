@@ -12,8 +12,38 @@
                 "toolCalling": true,
                 "vision": false,
                 "thinking": true,
-                "maxInputTokens": 128000,
-                "maxOutputTokens": 16000
+                "contextWindow": 1048576,
+                "maxOutputTokens": 32000
+            },
+            {
+                "id": "kimi-k3",
+                "name": "Kimi K3 (eInfra)",
+                "url": "https://llm.ai.e-infra.cz/v1",
+                "toolCalling": true,
+                "vision": true,
+                "thinking": true,
+                "contextWindow": 1048576,
+                "maxOutputTokens": 32000
+            },
+            {
+                "id": "deepseek-v4.1-flash",
+                "name": "DeepSeek V4.1 Flash (eInfra)",
+                "url": "https://llm.ai.e-infra.cz/v1",
+                "toolCalling": true,
+                "vision": true,
+                "thinking": true,
+                "contextWindow": 1048576,
+                "maxOutputTokens": 32000
+            },
+            {
+                "id": "mistral-medium-3.5",
+                "name": "Mistral Medium 3.5 (eInfra)",
+                "url": "https://llm.ai.e-infra.cz/v1",
+                "toolCalling": true,
+                "vision": true,
+                "thinking": true,
+                "contextWindow": 262144,
+                "maxOutputTokens": 32000
             }
         ]
     }
